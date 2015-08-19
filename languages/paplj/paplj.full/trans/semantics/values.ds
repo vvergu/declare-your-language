@@ -6,7 +6,7 @@ imports trans/semantics/runtime/runtime
 signature // basic values
   sorts This
   constructors
-    NumV       : Int -> V 
+    NumV       : Int -> V
     BoolV      : Bool -> V
     NullV      : V
     ExceptionV : V
@@ -28,7 +28,7 @@ rules
 
   C |- loadClass(c) --> C[c].
  
-  initClasses([]) --> {}. 
+  initClasses([]) --> {}.
   initClasses([c@Class(name, _, _, _) | cs]) --> {name |--> c, initClasses(cs)}.
 
 signature // object values
@@ -77,7 +77,7 @@ rules
   defaultValue(BoolT()) --> BoolV(false).
   defaultValue(ClassT(_)) --> NullV().
 
-  initMethods([]) --> {}.  
+  initMethods([]) --> {}.
   initMethods([m@Method(_, name, _, _) | ms]) --> {name |--> m, initMethods(ms)}.
  
 rules // lookup field 

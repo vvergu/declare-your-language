@@ -7,6 +7,7 @@ signature
     Program --> V 
     Expr --> V  
     List(Expr) --> List(V)
+    List(Seq) -seq-> V
 
 rules
 
@@ -31,12 +32,14 @@ rules // boolean expressions
   If(BoolV(false), _, e) --> e.
   
 rules // control-flow
-
-  Do([]) --> U().
   
-  Do([v]) --> v.
+  Do(ss) --> ss.
   
-  Do([v | stats@[_|_]]) --> Do(stats).
+  [] : List(Seq) -seq-> U().
+  
+  [Skip() | xs] : List(Seq) -seq-> xs.
+  
+  [v | xs] : List(Seq) -seq-> xs.
   
 rules // arithmetic expressions
 
@@ -61,9 +64,12 @@ rules // variables
   Var(x) --> readVar(x).
   
   Let([], v) --> v.
+
+  Let([b1, b2 | bs], e) --> Let([b1], Let([b2 | bs], e)).
   
-  Let([Bind(_, x, v) | binds], e) --> v'
-  where Env bindVar(x, v) |- Let(binds, e) --> v'.
+  Let([Bind(_, x, v)], e) --> v'
+  where
+    Env bindVar(x, v) |- e --> v'.
   
 rules // objects
  
@@ -76,8 +82,9 @@ rules // objects
   Null(_) --> NullV().
      
   Call(o, m, vs: List(V)) --> v'
-  where lookupMethod(o, m) --> Method(_, _, params, e);
-        This o, Env bindVars(params, vs) |- e --> v'. 
+  where
+    lookupMethod(o, m) --> Method(_, _, params, e);
+    This o, Env bindVars(params, vs) |- e --> v'. 
 
   This o |- This() --> o.  
   
